@@ -1,0 +1,462 @@
+<?php
+/**
+ * The featured slider on the home page
+ *
+ */
+global $cp_options;
+?>
+
+<?php if ( $cp_options->enable_featured ) : ?>
+
+	<script type="text/javascript">
+		// <![CDATA[
+		/* featured listings slider */
+		jQuery(document).ready(function($) {
+			$('.sli1').jCarouselLite({
+				btnNext: '.next1',
+				btnPrev: '.prev1',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+			$('.sli2').jCarouselLite({
+				btnNext: '.next2',
+				btnPrev: '.prev2',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+			$('.sli3').jCarouselLite({
+				btnNext: '.next3',
+				btnPrev: '.prev3',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+			$('.sli4').jCarouselLite({
+				btnNext: '.next4',
+				btnPrev: '.prev4',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+			$('.sli5').jCarouselLite({
+				btnNext: '.next5',
+				btnPrev: '.prev5',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+			$('.sli6').jCarouselLite({
+				btnNext: '.next6',
+				btnPrev: '.prev6',
+				pause: true,
+				auto: true,
+				timeout: 28000,
+				speed: 1100,
+				easing: 'easeOutQuint' // for different types of easing, see easing.js
+			});
+		});
+		// ]]>
+	</script>
+		<!-- featured listings -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Horse Shows</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev1"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli1">
+
+							<ul>
+                    <?php 
+
+					$sql="SELECT *FROM horseshows";
+					//echo $sql;
+					$results = $wpdb->get_results($sql);
+					foreach($results as $result)
+					{
+						//var_dump($results);
+					
+						//var_dump($result);
+?>
+                    <li style="height:260px; width:180px;"> 
+                        <span class="feat_left">
+                            <a href="<?php echo site_url();?>/show-details/?id=<?php echo $result->id; ?>" title="dxsgdg" class="preview" data-rel="<?php echo $result->image; ?>" >
+                            <img src="<?php echo $result->image; ?>" width="150px" height="200px" alt="<?php echo $result->name_show; ?>"/>
+                            <?php /*?><?php echo get_avatar( get_the_author_meta( 'ID' ), 64 ); ?><?php */?> 
+                            </a>
+                        </span>
+                        <div class="clr"></div>
+                        <p><a href="<?php echo site_url();?>/show-details/?id=<?php echo $result->id; ?>"><?php echo $result->name_show; ?></a></p>
+                        <p style="color:#020202;"><?php $string = $result->show_desc; $string = substr($string , 0, 20); echo $string;?>...  <a href="<?php echo site_url();?>/show-details/?id=<?php echo $result->id; ?>" style="color:#0054a6; font-size:12px;">read more</a></p>
+                    </li>
+                     <?php };?>
+                  </ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next1"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+        <!-- Find buyers -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Find Buyers</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev2"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli2">
+
+							<ul>
+                            	<?php 
+
+$args = array( 'post_type' => 'ad_listing', 'posts_per_page' => 10 );
+$loop = new WP_Query( $args );
+while ( $loop->have_posts() ) : $loop->the_post();
+ $pst=get_post( get_the_ID()); $meta_id = $pst->ID;
+ $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='seller')
+	  	continue;
+?>
+
+									<li style="height:260px; width:180px;">
+
+										<span class="feat_left">
+
+											<?php echo get_avatar( get_the_author_meta( 'ID' ), 64 ); ?>
+											
+											
+
+										</span>
+
+                                        <div class="clr"></div>
+
+										<?php /*?><p><a href="#"><?php the_author() ?></a></p><?php */?>
+                                        <p><a href="<?php echo get_site_url().'/author/'.get_the_author(); ?>"><?php the_author() ?></a></p>
+                                        <p style="color:#020202;"><?php echo cp_get_content_preview( 20 ); ?><a href="<?php echo site_url();?>/ads/<?php echo $pst->post_name; ?>" style="color:#0054a6; font-size:12px;">read more</a></p>
+                                        
+									</li>
+
+								<?php endwhile; ?>
+
+
+							</ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next2"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+         <!-- Hunters listings -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Hunters</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev3"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli3">
+
+							<ul>
+                            	<?php 
+
+$args = array( 'post_type' => 'ad_listing','ad_cat' => 'hunters', 'posts_per_page' => 10 );
+$loop = new WP_Query( $args);
+while ( $loop->have_posts() ) : $loop->the_post();
+ $pst=get_post( get_the_ID()); $meta_id = $pst->ID;
+ $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='buyer')
+	  	continue;
+?>
+
+									<li style="height:260px; width:180px;">
+
+										<span class="feat_left">
+
+											<?php if ( $cp_options->ad_images ) cp_ad_featured_thumbnail(); ?>
+											
+											
+
+										</span>
+
+                                        <div class="clr"></div>
+
+										<p><a href="<?php the_permalink(); ?>"><?php if ( mb_strlen( get_the_title() ) >= $cp_options->featured_trim ) echo mb_substr( get_the_title(), 0, $cp_options->featured_trim ).'...'; else the_title(); ?></a>
+</p>
+                                        <?php /*?><p style="color:#020202;"><?php echo cp_get_content_preview( 20 ); ?><a href="#" style="color:#0054a6; font-size:12px;">read more</a></p><?php */?>
+										<p style="color:#020202;"><?php echo substr($pst->post_content,0,20); ?><a href="<?php echo the_permalink(); ?>" style="color:#0054a6; font-size:12px;">..read more</a></p>
+										
+
+									</li>
+
+								<?php endwhile; ?>
+
+
+							</ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next3"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+         <!-- JUMBERS listings -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Jumpers</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev4"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli4">
+
+							<ul>
+                            	<?php 
+
+$args = array( 'post_type' => 'ad_listing','ad_cat' => 'jumpers', 'posts_per_page' => 10 );
+$loop = new WP_Query( $args);
+while ( $loop->have_posts() ) : $loop->the_post();
+ $pst=get_post( get_the_ID()); $meta_id = $pst->ID;
+ $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='buyer')
+	  	continue;?>
+
+									<li style="height:260px; width:180px;">
+
+										<span class="feat_left">
+
+											<?php if ( $cp_options->ad_images ) cp_ad_featured_thumbnail(); ?>
+											
+											
+
+										</span>
+
+                                        <div class="clr"></div>
+
+										<p><a href="<?php the_permalink(); ?>"><?php if ( mb_strlen( get_the_title() ) >= $cp_options->featured_trim ) echo mb_substr( get_the_title(), 0, $cp_options->featured_trim ).'...'; else the_title(); ?></a>
+</p>
+                                       <?php /*?> <p style="color:#020202;"><?php echo cp_get_content_preview( 20 ); ?><a href="#" style="color:#0054a6; font-size:12px;">read more</a></p><?php */?>
+                                       <p style="color:#020202;"><?php echo substr($pst->post_content,0,20); ?><a href="<?php echo the_permalink(); ?>" style="color:#0054a6; font-size:12px;">..read more</a></p>
+
+										
+
+									</li>
+
+								<?php endwhile; ?>
+
+
+							</ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next4"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+
+		 <!-- PONIES listings -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Ponies</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev5"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli5">
+
+							<ul>
+                            	<?php 
+
+$args = array( 'post_type' => 'ad_listing','ad_cat' => 'ponies', 'posts_per_page' => 10 );
+$loop = new WP_Query( $args);
+while ( $loop->have_posts() ) : $loop->the_post();
+ $pst=get_post( get_the_ID()); $meta_id = $pst->ID;
+ $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='buyer')
+	  	continue;?>
+
+									<li style="height:260px; width:180px;">
+
+										<span class="feat_left">
+
+											<?php if ( $cp_options->ad_images ) cp_ad_featured_thumbnail(); ?>
+											
+											
+
+										</span>
+
+                                        <div class="clr"></div>
+
+										<p><a href="<?php the_permalink(); ?>"><?php if ( mb_strlen( get_the_title() ) >= $cp_options->featured_trim ) echo mb_substr( get_the_title(), 0, $cp_options->featured_trim ).'...'; else the_title(); ?></a>
+</p>
+                                        <p style="color:#020202;"><?php echo cp_get_content_preview( 20 ); ?><a href="<?php echo the_permalink(); ?>" style="color:#0054a6; font-size:12px;">read more</a></p>
+
+										
+
+									</li>
+
+								<?php endwhile; ?>
+
+
+							</ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next5"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+         <!-- DRESSAGE listings -->
+		<div class="shadowblock_out_home slider_top">
+
+			<div class="shadowblockdir">
+
+				<h2 class="home_slider_f">Dressage</h2>
+
+				<div class="sliderblockdir">
+
+					<div class="prev prev6"></div>
+
+					<div id="sliderlist">
+
+						<div class="slider sli6">
+
+							<ul>
+                            	<?php 
+
+$args = array( 'post_type' => 'ad_listing','ad_cat' => 'dressage', 'posts_per_page' => 10 );
+$loop = new WP_Query( $args);
+while ( $loop->have_posts() ) : $loop->the_post();
+ $pst=get_post( get_the_ID()); $meta_id = $pst->ID;
+ $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='buyer')
+	  	continue;?>
+
+									<li style="height:260px; width:180px;">
+
+										<span class="feat_left">
+
+											<?php if ( $cp_options->ad_images ) cp_ad_featured_thumbnail(); ?>
+											
+											
+
+										</span>
+
+                                        <div class="clr"></div>
+
+										<p><a href="<?php the_permalink(); ?>"><?php if ( mb_strlen( get_the_title() ) >= $cp_options->featured_trim ) echo mb_substr( get_the_title(), 0, $cp_options->featured_trim ).'...'; else the_title(); ?></a>
+</p>
+                                        <p style="color:#020202;"><?php echo cp_get_content_preview( 20 ); ?><a href="<?php echo the_permalink(); ?>" style="color:#0054a6; font-size:12px;">read more</a></p>
+
+										
+
+									</li>
+
+								<?php endwhile; ?>
+
+
+							</ul>
+
+						</div>
+
+					</div><!-- /slider -->
+
+					<div class="next next6"></div>
+
+					<div class="clr"></div>
+
+				</div><!-- /sliderblock -->
+
+			</div><!-- /shadowblock -->
+
+		</div><!-- /shadowblock_out -->
+
+
+
+	<?php appthemes_after_loop('featured'); ?>
+
+	<?php wp_reset_postdata(); ?>
+
+<?php endif; // end feature ad slider check ?>
+
+

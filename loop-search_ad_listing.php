@@ -1,0 +1,207 @@
+<?php
+/**
+ * Main loop for displaying ads
+ *
+ * @package ClassiPress
+ * @author AppThemes
+ *
+ */
+global $wpdb; 
+global $cp_options;
+?>
+<?php appthemes_after_endwhile();
+ ?>
+<?php appthemes_before_loop(); 
+
+?>
+<?php /*?><?php if ( have_posts() ) : ?>
+<?php while ( have_posts() ) : the_post();  ?>
+<?php $pst=get_post( get_the_ID()); $meta_id = $pst->ID;?>
+<?php $sql="SELECT meta_value FROM wp_postmeta WHERE meta_key='cp_type' AND post_id=".$meta_id;
+      $post_details = $wpdb->get_results($sql);
+	  if($post_details[0]->meta_value=='buyer')
+	  	continue;
+
+ ?>
+<?php */
+$flag=0;
+$paged = ( get_query_var( 'paged' ) ) ? absint( get_query_var( 'paged' ) ) : 1;
+$term = get_queried_object();
+
+
+$args = array( 'post_type' => 'ad_listing', 'posts_per_page' =>10,'paged' => $paged,);		
+	
+//$wp_query->posts_per_page=10;
+//$wp_query->paged=$paged;
+//$loop = new WP_Query( $args);
+//while ( $loop->have_posts() ) : $loop->the_post();
+
+
+//$loop = new WP_Query( $args);
+//$loop = new WP_Query();
+//echo $wpdb->last_query;
+//echo $wp_query->request;
+
+while ( $wp_query->have_posts() ) : $wp_query->the_post();
+	
+	$flag=1;
+ 	$pst=get_post( get_the_ID()); 
+	$meta_id = $pst->ID;
+	$post_taxonomy_categories= get_the_terms( $meta_id, 'ad_cat' );
+	
+	//$taxonomies=get_taxonomies('','names');
+	//$post_taxonomy_categories=wp_get_post_terms($post->ID, $taxonomies,  array("fields" => "names"));
+
+	//var_dump($post_taxonomy_categories);	
+	//cp_id_986  is also state field for seller, for buyer it is cp_state
+	//cp_id_954  is for cp_breed 
+	//cp_id_628 is for cp_discipline
+ 		$sql="SELECT meta_value FROM wp_postmeta WHERE meta_key IN ('cp_type','cp_state','cp_id_986','cp_breed','cp_id_954','cp_discipline','cp_id_628') AND post_id=".$meta_id;
+      	$post_details = $wpdb->get_results($sql);
+		//var_dump($post_details);
+		
+	    //echo $meta_id.'<br/>';
+	  
+		if(isset($_GET['cp_type'])&&(trim($_GET['cp_type'])!='')){
+			$flag_av=0;
+			for($i=0;$i<count($post_details);$i++){
+				if(strtolower($_GET['cp_type']) == strtolower($post_details[$i]->meta_value))
+					$flag_av=1;			
+				// in the database for many ads the meta 	cp_type = seller not added, so just avoiding records with buyer in case of seller search and viceversa
+				if(strtolower($post_details[$i]->meta_value)=='buyer' && strtolower($_GET['cp_type']) == 'seller' )
+					continue;
+				elseif(strtolower($post_details[$i]->meta_value)=='seller' && strtolower($_GET['cp_type']) == 'buyer' )
+					continue;			
+			}
+			// in the database for many ads the meta 	cp_type = seller not added, so just avoiding records with buyer in case of seller search and viceversa
+			//so for now the checking the meta=seller added checking disabled.
+			/*if($flag_av==0)
+				continue;			*/
+		}
+		
+	  		//continue;
+		
+		if(isset($_GET['cp_state'])&&(trim($_GET['cp_state'])!='')){
+			$flag_av=0;
+			for($i=0;$i<count($post_details);$i++){
+				//echo strtolower($post_details[$i]->meta_value).'--'.strtolower($_GET['cp_state']).'<br/>';
+				if(strtolower($_GET['cp_state']) == strtolower($post_details[$i]->meta_value))
+					$flag_av=1;			
+			}
+			if($flag_av==0)
+				continue;
+		}
+		//echo $flag_av;exit;
+		
+		if(isset($_GET['cp_breed'])&&(trim($_GET['cp_breed'])!='')){
+			$flag_av=0;
+			for($i=0;$i<count($post_details);$i++){	
+			//echo strtolower($_GET['cp_breed']).'--'.strtolower($post_details[$i]->meta_value).'<br/>';
+				if(strtolower($_GET['cp_breed']) == strtolower($post_details[$i]->meta_value))
+					$flag_av=1;
+				
+			}
+			if($flag_av==0)
+				continue;
+		}
+		
+		if(isset($_GET['cp_discipline'])&&(trim($_GET['cp_discipline'])!='')){
+			$flag_av=0;
+			for($i=0;$i<count($post_details);$i++){	
+				if(strtolower($_GET['cp_discipline']) == strtolower($post_details[$i]->meta_value))
+					$flag_av=1;
+			
+			}
+			if($flag_av==0 && is_array($post_taxonomy_categories))
+			{				
+				foreach($post_taxonomy_categories as $post_taxonomy_category)
+				{					
+					if(strtolower($_GET['cp_discipline']) == strtolower($post_taxonomy_category->slug))
+					$flag_av=1;
+				}
+			}
+			if($flag_av==0)
+				continue;
+		}
+		//}
+	
+
+
+?>	<?php appthemes_before_post(); ?>
+		<div class="post-block-out <?php cp_display_style( 'featured' ); ?>">
+
+			<div class="post-block">
+
+				<div class="post-left">
+
+					<?php 
+					
+					
+					if ( $cp_options->ad_images ) cp_ad_loop_thumbnail(); ?>
+
+				</div>
+                <span class="price_span"><?php appthemes_before_post_title(); ?></span>
+
+				<div class="<?php cp_display_style( array( 'ad_images', 'ad_class' ) ); ?>">
+
+					
+
+					<h3><a href="<?php the_permalink(); ?>"><?php if ( mb_strlen( get_the_title() ) >= 75 ) echo mb_substr( get_the_title(), 0, 75 ).'...'; else the_title(); ?></a></h3>
+
+					<div class="clr"></div>
+                    <p><?php cp_get_ad_details( $post->ID, $cat_id );				
+									?></p>
+				</div>
+                <?php $id = $post->ID;  $sql="SELECT MAX(horseshows.show_date_time) AS 'recentdate',horseshows.id,horseshows.city,horseshows.state FROM horseshows LEFT JOIN horseshows_meta ON horseshows.id=horseshows_meta.show_id WHERE horseshows_meta.post_id='$id'";
+				$details = $wpdb->get_results($sql);
+				$recentdate = $details[0]->recentdate;
+				 $sql1="SELECT id,name_show,city,state FROM horseshows WHERE show_date_time='$recentdate'";
+					$details1 = $wpdb->get_results($sql1);
+				
+				?>
+                <div class="show_time"><p>Next Show:<span style="font-weight:bold;"><?php if(!empty($details[0]->id)){ echo $details[0]->recentdate.'</br>'.$details1[0]->city.','.$details1[0]->state; }else echo "not added in show"; ?></span></p></div>
+                <div style="clear:right"></div>
+                <div class="post-right_icons" style="width:auto">
+                <style>.lrshare_iconsprite32.lrshare_sharingcounter32{display:none;}.lrshare_iconsprite32.lrshare_evenmore32{display:none;}</style>
+                <!--shortcode for social share using social share plugin-->
+				<?php echo do_shortcode( '[LoginRadius_Share]' ); ?>
+                <?php /*?><img  src="<?php bloginfo('template_url'); ?>/images/post_msg.png" width="34" height="34" alt="" /> 
+                <img  src="<?php bloginfo('template_url'); ?>/images/post_phone.png" width="34" height="34" alt="" />
+		<img  src="<?php bloginfo('template_url'); ?>/images/post_fev.png" width="34" height="34" alt="" /><?php */?>
+		
+		
+		
+		
+		<style>
+                .widget-container{
+				list-style:none;
+				}
+                </style>
+                <?php 
+      // Custom widget area start
+      if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('Custom Widget Area') ) : ?>
+<?php endif; ?></div>
+
+				<div class="clr"></div>
+                
+                
+                <div class="post-desc"><?php echo cp_get_content_preview( 160 ); ?></div>
+
+			</div><!-- /post-block -->
+
+		</div><!-- /post-block-out -->
+		<?php appthemes_after_post(); ?>
+
+	<?php endwhile; ?>
+    <?php if($flag==0) echo '<div style="min-height:50%;padding:30px;text-align:center;"><h1>Search results not found...</h1></div>';?>
+	<?php appthemes_after_endwhile(); ?>
+
+<?php /*?><?php else: ?>
+
+	<?php appthemes_loop_else(); ?>
+
+<?php endif; ?>
+<?php */?>
+<?php appthemes_after_loop(); ?>
+
+<?php wp_reset_query(); ?>
